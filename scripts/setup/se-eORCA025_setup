@@ -7,15 +7,14 @@ display_usage() {
    echo "  ***************************************"
    echo
    echo "  usage: ${0##*/} -w path_to_install_nemo -x path_to_intall_xios -s path_to_repo"
-   echo "                  -m machine -v version -c compiler -a mpi_build"
+   echo "                  -m machine "
    echo
    echo "  flags:  -w full path to where nemo will be installed"
    echo "          -x full path to where xios will be installed"
    echo "          -s full path to where SE-NEMO repository resides"
-   echo "          -v NEMO vserion"
    echo "          -m machine name"
-   echo "          -c compiler"
    echo "          -a MPI build [mpich|mpich4|ompi]"
+   echo "          -c MPI build [gnu|cray]"
    echo
    exit 1
 	} 
@@ -38,7 +37,7 @@ display_usage() {
 		exit 0
 	fi 
 
-while getopts w:x:s:m:v:c:a: option
+while getopts w:x:s:m:a:c: option
   do
   case "${option}"
   in
@@ -46,9 +45,8 @@ while getopts w:x:s:m:v:c:a: option
   x) export XIOS_DIR=${OPTARG};;
   s) export REPO_DIR=${OPTARG};;
   m) export HPC_TARG=${OPTARG};;
-  v) export NEMO_VER=${OPTARG};;
-  c) export COMPILER=${OPTARG};;
   a) export MPI_TARG=${OPTARG};;
+  c) export CMP_TARG=${OPTARG};;
   esac
 done
 
@@ -77,7 +75,7 @@ echo "Making sure that the correct modules are loaded"
 
 case "${HPC_TARG}"
   in
-  archer2) . $REPO_DIR/scripts/env/${HPC_TARG}-${COMPILER}-${MPI_TARG}
+  archer2) . $REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}
            ;;
   *)       echo "Machine not recognised"
            echo "Machines available: archer2"
@@ -86,59 +84,34 @@ esac
 
 export LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
-case "${NEMO_VER}"
-  in
-  4.0.4)   echo "NEMO Version 4.0.4 will be checked out"
-           ;;
-  4.2.0)   echo "NEMO Version 4.2.0 will be checked out"
-           ;;
-  4.2)     echo "NEMO Head of branch 4.2  will be checked out"
-           ;;
-  *)       echo "NEMO Version not recognised"
-           echo "Versions available: 4.0.4, 4.2.0, branch 4.2"
-           exit 1
-esac
+# Currently running 4.0.4 for SE-NEMO
+NEMO_VER=4.0.4
 
-# Checkout the NEMO code from the SVN Paris repository
+# Checkout the NEMO code from the SVN Paris repository 
 echo "Checking out NEMO repository"
-case "${NEMO_VER}"
-  in
-  4.2)     git clone --branch branch_4.2 https://forge.nemo-ocean.eu/nemo/nemo.git nemo
-           ;;
-  4.2.0)   git clone --branch 4.2.0 https://forge.nemo-ocean.eu/nemo/nemo.git nemo
-           ;;
-  *)       svn co http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/r4.0/r$NEMO_VER --depth empty nemo
-           svn co http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/r4.0/r$NEMO_VER/src --depth infinity nemo/src
-           svn co http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/r4.0/r$NEMO_VER/cfgs/SHARED nemo/cfgs/SHARED
-           svn export http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/r4.0/r$NEMO_VER/cfgs/ref_cfgs.txt nemo/cfgs/ref_cfgs.txt
-           ;;
-esac
+
+svn co http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/r4.0/r$NEMO_VER --depth empty nemo
+svn co http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/r4.0/r$NEMO_VER/src --depth infinity nemo/src
+svn co http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/r4.0/r$NEMO_VER/cfgs/SHARED nemo/cfgs/SHARED
+svn export http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/r4.0/r$NEMO_VER/cfgs/ref_cfgs.txt nemo/cfgs/ref_cfgs.txt
 
 cd nemo
 
 # Now check EXTERNALS revision number before checking out the rest
-case "${NEMO_VER}"
-  in
-  4.2)     echo "Nothing to do as EXTERNALS are integral to 4.2"
-           ;;
-  4.0.2)     echo "Nothing to do as EXTERNALS are integral to 4.2.0"
-           ;;
-  *)       for ext_name in mk FCM IOIPSL
-             do
-             ext=`svn propget svn:externals | grep $ext_name | cut -c2-`
-             svn co http://forge.ipsl.jussieu.fr/nemo/svn/$ext
-           done
-           ext=`svn propget svn:externals | grep makenemo | cut -c2-`
-           svn export http://forge.ipsl.jussieu.fr/nemo/svn/$ext
-           ;;
-esac
+for ext_name in mk FCM IOIPSL   
+  do   
+  ext=`svn propget svn:externals | grep $ext_name | cut -c2-`   
+  svn co http://forge.ipsl.jussieu.fr/nemo/svn/$ext
+done
+
+ext=`svn propget svn:externals | grep makenemo | cut -c2-`
+svn export http://forge.ipsl.jussieu.fr/nemo/svn/$ext
 
 mkdir arch
 
 # Setup the directory structure for the ENSEMBLE
 mkdir $WORK_DIR/nemo/cfgs/se-eORCA025
-
-# Define the location of where the forcing files are to be downloaded 
+# Define the location of where the AMM7 forcing files are to be downloaded 
 export DOWNLOAD_DIR="$WORK_DIR/nemo/cfgs/se-orca025/EXPREF/"
 
 echo $XIOS_DIR
@@ -146,36 +119,23 @@ echo $XIOS_DIR
 if [ ! -d "$XIOS_DIR" ]; then
   mkdir $XIOS_DIR
 fi
-
-# Checkout the XIOS code from the SVN repository
 cd $XIOS_DIR
-
+echo $PWD
 echo "Checking out xios repository"
-
-case "${NEMO_VER}"
-  in
-  4.2)     svn checkout  http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/trunk@2379 xios
-           ;;
-  *)       svn co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/branchs/xios-2.5@1964 xios
-           ;;
-esac
-
-
+svn co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/branchs/xios-2.5@1964 xios
 cd xios
 cp $REPO_DIR/arch/xios/* ./arch
 
 echo "Compiling xios"
-./make_xios --full --prod --arch ${HPC_TARG}-${COMPILER}-${MPI_TARG} --netcdf_lib netcdf4_par --job 10
+./make_xios --full --prod --arch ${HPC_TARG}-${CMP_TARG}-${MPI_TARG} --netcdf_lib netcdf4_par --job 4
 
 # Let's update the path to xios
 export XIOS_DIR=$XIOS_DIR/xios
 
-[ -f $XIOS_DIR/bin/xios_server.exe ] || exit 1
-
 cd $WORK_DIR/nemo
 cp $REPO_DIR/arch/nemo/* ./arch
 # Dirty fix to hard wire path otherwise user will have to set XIOS_DIR in every new shell session
-sed -i "s?XXX_XIOS_DIR_XXX?$XIOS_DIR?" ./arch/arch-${HPC_TARG}-${COMPILER}-${MPI_TARG}.fcm
+sed -i "s?XXX_XIOS_DIR_XXX?$XIOS_DIR?" ./arch/arch-${HPC_TARG}-${CMP_TARG}-${MPI_TARG}.fcm
 
 echo 'se-eORCA025 OCE ICE' >> $WORK_DIR/nemo/cfgs/work_cfgs.txt
 
@@ -191,18 +151,18 @@ case "${HPC_TARG}"
   archer2) ln -s /work/n01/shared/se-eORCA025 INPUTS
            ;;
   *)       wget http://gws-access.ceda.ac.uk/public/jmmp/se-eORCA025/inputs.tar.gz
-           tar xvfz inputs.tar.gz
+	   tar xvfz inputs.tar.gz
            ;;
 esac
 
-cp -r $REPO_DIR/EXPREF/$NEMO_VER/ EXPREF
+cp -r $REPO_DIR/EXPREF .
 cd $CONFIG_DIR/EXPREF
 
 ## Add ENV into runscipts
 case "${HPC_TARG}"
   in
-  archer2) sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${HPC_TARG}-${COMPILER}-${MPI_TARG}?" runscript.slurm
-           sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${HPC_TARG}-${COMPILER}-${MPI_TARG}?" runscript.mpirun
+  archer2) sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript.slurm
+           sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript.mpirun
            ;;
   *)       sed -i "s?XXX_ENV_XXX??" runscript.slurm
            sed -i "s?XXX_ENV_XXX??" runscript.mpirun 
@@ -235,14 +195,14 @@ cp $REPO_DIR/scripts/run/* $CONFIG_DIR/EXPREF
 
 cd $WORK_DIR/nemo
 
-echo "Compiling nemo se-eORCA025 Config"
-./makenemo -m ${HPC_TARG}-${COMPILER}-${MPI_TARG} -r se-eORCA025 -j 10
+echo "Compiling nemo SE-ORCA025 Config"
+./makenemo -m ${HPC_TARG}-${CMP_TARG}-${MPI_TARG} -r se-eORCA025 -j 16
 
 echo
-echo "  Auto-Config: se-eORCA025"
-echo "  **********************"
+echo "  Auto-Config: SE-eORCA025"
+echo "  *****************************"
 echo
-echo "  To run the se-eORCA025 Configuration:"
+echo "  To run the SE-eORCA025 Configuration:"
 echo
 echo "  - cp -rP EXPREF EXP_MYRUN "
 echo "  - link the correct domain_cfg.nc "
