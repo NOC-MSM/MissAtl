@@ -149,6 +149,7 @@ cd $CONFIG_DIR
 case "${HPC_TARG}"
   in
   archer2) ln -s /work/n01/shared/se-eORCA025 INPUTS
+           ln -s /work/n01/shared/annkat/RIVERS_CNRM/ RIVERS
            ;;
   *)       wget http://gws-access.ceda.ac.uk/public/jmmp/se-eORCA025/inputs.tar.gz
 	   tar xvfz inputs.tar.gz
@@ -161,10 +162,12 @@ cd $CONFIG_DIR/EXPREF
 ## Add ENV into runscipts
 case "${HPC_TARG}"
   in
-  archer2) sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript.slurm
+  archer2) sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_GS1p0_CNRM_hist.slurm
+	   sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_full_CNRM.slurm
            sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript.mpirun
            ;;
-  *)       sed -i "s?XXX_ENV_XXX??" runscript.slurm
+  *)       sed -i "s?XXX_ENV_XXX??" runscript_GS1p0_CNRM_hist.slurm
+	   sed -i "s?XXX_ENV_XXX??" runscript_full_CNRM.slurm
            sed -i "s?XXX_ENV_XXX??" runscript.mpirun 
            ;;
 esac
@@ -183,6 +186,7 @@ ln -s INPUTS/M2rowdrg_R025_modif_nonpositive.nc M2rowdrg.nc
 ln -s INPUTS/mask_itf_ORCA025ext.nc mask_itf.nc
 ln -s INPUTS/bfr_coef.nc .
 ln -s INPUTS/shlat2d.nc .
+ln -s INPUTS/domcfg_eORCA025_v2.nc domain_cfg.nc
 
 # First copy GO8 code
 cp -r $REPO_DIR/MY_SRC_GO8_FROZEN $CONFIG_DIR/MY_SRC

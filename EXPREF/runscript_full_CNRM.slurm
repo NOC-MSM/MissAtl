@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --job-name=se-nemo
-#SBATCH --time=00:20:00
+#SBATCH --job-name=SE_notide
+#SBATCH --time=23:50:00
 #SBATCH --account=n01-CLASS
 #SBATCH --partition=standard
 #SBATCH --qos=standard
@@ -13,7 +13,7 @@ export UCX_IB_REG_METHODS=direct
 #################### nemo runscript options ############################
 # For info on the parameters see namelist_ref                          #
 ########################################################################
-rn_rdt=600          ; ln_zps='.false.'      ; ln_tmx_itf='.false.'
+rn_rdt=600         ; ln_zps='.false.'      ; ln_tmx_itf='.false.'
 ln_bt_auto='.true.' ; rn_bt_cmax=0.8        ; nn_baro=30
 nn_mxlice=3         ; nn_z0_ice=1           ; ln_rnf_new='.true.'
 ln_rstdate='.true.' ; ln_shlat2d='.true.'   ; nn_diaharm=1981
@@ -28,8 +28,8 @@ ln_hpg_djc='.true.' ;
 ########################################################################
 ln_spin='.true.'   # Do we require a spin up phase for the ice
 nn_spin=3          # How many years spin up
-year_st=1976       # Start year of the simulation (ramains constant)
-year_en=1981       # End year of this job submission
+year_st=1970       # Start year of the simulation (ramains constant)
+year_en=1975       # End year of this job submission
 offset=0           # If rdt has changed, an offset to nn_it000 is needed
 nn_spin_cycle=1    # Change to nn_spin+1 if year is .gt. year_st
 year=$year_st      # Change if starting job part way through simulation
@@ -82,6 +82,10 @@ else
    elif [ $SLURM_NNODES -eq 68 ]
    then
       SRUN_CMD=`./slurm_setup -S 32 -s 16 -m 2 -C 8090 -g 9000 -N 128 -t 01:00:00 -a n01-CLASS -j se-nemo`
+  #annkat note: this is the only one that works for me without hanging: 76 nodes
+   elif [ $SLURM_NNODES -eq 76 ]
+   then
+      SRUN_CMD=`./slurm_setup -S 8 -s 16 -m 1 -C 6429 -g 3 -N 128 -t 01:00:00 -a n01-CLASS -j se-nemo` 
    else
       exit
    fi
@@ -126,7 +130,8 @@ fi
 
 if [ "$ln_rnf_new" = ".true." ]
 then
-	sn_rnf="'.\/JRA_RIVERS\/ORCA025_rivers_Antar_Green',24,'rorunoff',.false.,.false.,'yearly'"
+        sn_rnf="'CNRM_hist',24,'rorunoff',.false.,.false.,'yearly'"
+        sn_dep="'CNRM_hist',24,'rodepth',.false.,.false.,'yearly'"
 else
 	sn_rnf="'runoff_1m_nomask.nc',-1,'sornficb',.true.,.true.,'yearly'"
 fi
@@ -149,7 +154,7 @@ do
    echo $year
 
    # Array pretending to be a Pythonic dictionary {EXP_NAME:NZ}
-   ARRAY=( "SENEMO:75"
+   ARRAY=( "MA_CNRM:75"
          )
 
    for ens in "${ARRAY[@]}"
@@ -165,7 +170,7 @@ do
 	 ln_diaharm='.false.'
       fi
 
-      if [ $year -eq 1976 ]
+      if [ $year -eq 1970 ]
       then
          nn_it000=1
 	 if [ $nn_spin_cycle -eq 1 ]
@@ -225,6 +230,7 @@ do
       sed -i "s/XXX_BTA_XXX/$ln_bt_auto/g" namelist_cfg
       sed -i "s/XXX_BTC_XXX/$rn_bt_cmax/g" namelist_cfg
       sed -i "s/XXX_RNF_XXX/$sn_rnf/g" namelist_cfg
+      sed -i "s/XXX_DEP_XXX/$sn_dep/g" namelist_cfg
       sed -i "s/XXX_TID_XXX/$ln_tide/g" namelist_cfg
       sed -i "s/XXX_ITF_XXX/$ln_tmx_itf/g" namelist_cfg
       sed -i "s/XXX_DHM_XXX/$ln_diaharm/g" namelist_cfg
