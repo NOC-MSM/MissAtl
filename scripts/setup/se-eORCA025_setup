@@ -203,10 +203,10 @@ echo "Compiling nemo SE-ORCA025 Config"
 ./makenemo -m ${HPC_TARG}-${CMP_TARG}-${MPI_TARG} -r se-eORCA025 -j 16
 
 echo
-echo "  Auto-Config: SE-eORCA025"
+echo "  Auto-Config: SE-eORCA025 MissAtl climate projections"
 echo "  *****************************"
 echo
-echo "  To run the SE-eORCA025 Configuration:"
+echo "  To run the SE-eORCA025 MissAtl Configuration:"
 echo
 echo "  - cp -rP EXPREF EXP_MYRUN "
 echo "  - link the correct domain_cfg.nc "

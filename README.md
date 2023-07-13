@@ -10,11 +10,12 @@ Base Configuration: GO8p6 at NEMO 4.0.4
 
 ```
 git clone git@github.com:NOC-MSM/SE-NEMO.git
-./SE-NEMO/scripts/setup/se-eORCA025_setup -w $PWD/test -x $PWD/test -s $PWD/SE-NEMO -m archer2 -a mpich -c gnu
-cd test/nemo/cfgs/se-eORCA025/
-cp -rP EXPREF EXP_CNRM
+./MissAtl/scripts/setup/se-eORCA025_setup -w $PWD/MODELS -x $PWD/MODELS -s $PWD/MissAtl -m archer2 -a mpich -c gnu
+mkdir RUNS
+cd RUNS
+cp -rP ../MODELS/nemo/cfgs/se-eORCA025/EXPREF EXP_CNRM
 cd EXP_CNRM
-ln -s ../INPUTS/domcfg_eORCA025_v2.nc domain_cfg.nc # or whatever domain_cfg you are using
+ln -s /work/n01/shared/se-eORCA025/domcfg_eORCA025_v2.nc domain_cfg.nc # or whatever domain_cfg you are using
 ```
 The scripts for running the different climate projection experiments are
 CNRM-CM6-1HR historical period:
