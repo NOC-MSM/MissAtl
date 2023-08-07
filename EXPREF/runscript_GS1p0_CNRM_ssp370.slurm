@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=SE_notide
-#SBATCH --time=00:20:00
+#SBATCH --time=23:50:00
 #SBATCH --account=n01-CLASS
 #SBATCH --partition=standard
 #SBATCH --qos=standard
@@ -28,11 +28,11 @@ ln_hpg_djc='.false.' ;
 ########################################################################
 ln_spin='.true.'   # Do we require a spin up phase for the ice
 nn_spin=3          # How many years spin up
-year_st=1970       # Start year of the simulation (ramains constant)
-year_en=1975       # End year of this job submission
+year_st=2015       # Start year of the simulation (ramains constant)
+year_en=2025       # End year of this job submission
 offset=0           # If rdt has changed, an offset to nn_it000 is needed
-nn_spin_cycle=1    # Change to nn_spin+1 if year is .gt. year_st
-year=$year_st      # Change if starting job part way through simulation
+nn_spin_cycle=4    # Change to nn_spin+1 if year is .gt. year_st
+year=2015  #$year_st      # Change if starting job part way through simulation
 ########################################################################
 
 
@@ -130,8 +130,8 @@ fi
 
 if [ "$ln_rnf_new" = ".true." ]
 then
-        sn_rnf="'CNRM_hist',24,'rorunoff',.false.,.false.,'yearly'"
-        sn_dep="'CNRM_hist',24,'rodepth',.false.,.false.,'yearly'"
+        sn_rnf="'CNRM_ssp370',24,'rorunoff',.false.,.false.,'yearly'"
+        sn_dep="'CNRM_ssp370',24,'rodepth',.false.,.false.,'yearly'"
 else
 	sn_rnf="'runoff_1m_nomask.nc',-1,'sornficb',.true.,.true.,'yearly'"
 fi
@@ -154,7 +154,7 @@ do
    echo $year
 
    # Array pretending to be a Pythonic dictionary {EXP_NAME:NZ}
-   ARRAY=( "CNRM_hist:75"
+   ARRAY=( "CNRM_ssp370:75"
          )
 
    for ens in "${ARRAY[@]}"
@@ -170,25 +170,16 @@ do
 	 ln_diaharm='.false.'
       fi
 
-      if [ $year -eq 1970 ]
+      ln_rstart=".true."
+      ln_tide_ramp='.false.'
+      ln_reset_ts='.false.'
+      if [ $year -eq 2015 ]
       then
          nn_it000=1
-	 if [ $nn_spin_cycle -eq 1 ]
-         then
-            ln_rstart='.false.'	  
-	    ln_tide_ramp='.false.'
-	 else
-            ln_rstart='.true.'	  
-	    ln_tide_ramp='.false.'
-         fi
 	 nn_rstctl=0
-         ln_reset_ts='.true.'
       else
          nn_it000=`./end_time_step $(( $year - 1 )) $rn_rdt $year_st` ; rs0=`printf "%08d" $nn_it000`; nn_it000=$(( $nn_it000 + 1 + $offset ))
-         ln_rstart=".true."
 	 nn_rstctl=2
-	 ln_tide_ramp='.false.'
-         ln_reset_ts='.false.'
       fi
        
       if [ "$ln_rstdate" = ".true." ]
@@ -202,22 +193,18 @@ do
       fi 
 
       nn_itend=`./end_time_step $year $rn_rdt $year_st`; nn_itend=$(( $nn_itend + $offset ))
-      if [ $nn_spin_cycle -le $nn_spin ]
+      sed    "s/XXX_EXP_XXX/$nam/g" namelist_cfg_template_CNRM_ssp370 > namelist_cfg 
+      # annkat: if you change the name of the simulation after the historical period to e.g. ssp change the
+      # following restart name too (CNRM_hist_2015 in my case) 
+      if [ $year -eq 2015 ]
       then
-         sed    "s/XXX_EXP_XXX/$nam\_S$nn_spin_cycle/g" namelist_cfg_template_CNRM_hist > namelist_cfg
-         sed -i "s/XXX_RS0_XXX/$nam\_S$(($nn_spin_cycle-1))_$rs0\_restart/g" namelist_cfg
-         sed "s/XXX_RS0_XXX/$nam\_S$(($nn_spin_cycle-1))_$rs0\_restart_ice/g" namelist_ice_cfg_template > namelist_ice_cfg
+	 sed -i "s/XXX_RS0_XXX/CNRM_hist_20150101_restart/g" namelist_cfg
+         sed "s/XXX_RS0_XXX/CNRM_hist_20150101_restart_ice/g" namelist_ice_cfg_template > namelist_ice_cfg
       else
-         sed    "s/XXX_EXP_XXX/$nam/g" namelist_cfg_template_CNRM_hist > namelist_cfg
-	 if [ $year -eq $year_st ]
-         then
-            sed -i "s/XXX_RS0_XXX/$nam\_S$(($nn_spin_cycle-1))_$rs0\_restart/g" namelist_cfg
-            sed "s/XXX_RS0_XXX/$nam\_S$(($nn_spin_cycle-1))_$rs0\_restart_ice/g" namelist_ice_cfg_template > namelist_ice_cfg
-         else
-            sed -i "s/XXX_RS0_XXX/$nam\_$rs0\_restart/g" namelist_cfg
-            sed "s/XXX_RS0_XXX/$nam\_$rs0\_restart_ice/g" namelist_ice_cfg_template > namelist_ice_cfg
-         fi
+         sed -i "s/XXX_RS0_XXX/$nam\_$rs0\_restart/g" namelist_cfg
+         sed "s/XXX_RS0_XXX/$nam\_$rs0\_restart_ice/g" namelist_ice_cfg_template > namelist_ice_cfg	          
       fi
+
       sed -i "s/XXX_TST_XXX/$nn_it000/g" namelist_cfg
       sed -i "s/XXX_YEAR_XXX/$year/g" namelist_cfg
       sed -i "s/XXX_TEN_XXX/$nn_itend/g" namelist_cfg

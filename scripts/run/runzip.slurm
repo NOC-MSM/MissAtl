@@ -6,6 +6,8 @@
 #SBATCH --qos=serial
 
 . XXX_ENV_XXX/gnu-mpich
+export LD_LIBRARY_PATH=${CRAY_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}
+export OMP_NUM_THREADS=1
 
 if [ -z OUTPUTS_ZIP ]
 then
@@ -16,6 +18,6 @@ cd OUTPUTS
 
 for i in *
 do
-	nccopy -4 -d 1 $i ../OUTPUTS_ZIP/$i
+	nccopy -4 -d 1 -c x/64,y/64 $i ../OUTPUTS_ZIP/$i
 done
 

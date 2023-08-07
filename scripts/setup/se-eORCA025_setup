@@ -163,11 +163,11 @@ cd $CONFIG_DIR/EXPREF
 case "${HPC_TARG}"
   in
   archer2) sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_GS1p0_CNRM_hist.slurm
-	   sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_full_CNRM.slurm
+	   sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_GS1p0_CNRM_ssp370.slurm
            sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript.mpirun
            ;;
   *)       sed -i "s?XXX_ENV_XXX??" runscript_GS1p0_CNRM_hist.slurm
-	   sed -i "s?XXX_ENV_XXX??" runscript_full_CNRM.slurm
+	   sed -i "s?XXX_ENV_XXX??" runscript_GS1p0_CNRM_ssp370.slurm
            sed -i "s?XXX_ENV_XXX??" runscript.mpirun 
            ;;
 esac

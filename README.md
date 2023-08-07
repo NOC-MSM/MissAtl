@@ -14,12 +14,16 @@ git clone git@github.com:NOC-MSM/SE-NEMO.git
 cd nemo/cfgs/se-eORCA025/
 cp -rP EXPREF EXP_CNRM
 cd EXP_CNRM
-ln -s /work/n01/shared/se-eORCA025/domcfg_eORCA025_v2.nc domain_cfg.nc # or whatever domain_cfg you are using
+ln -s /work/n01/shared/yuti/se-ORCA025_domain_zps/domain_cfg_zps.closea.nc domain_cfg.nc # or whatever domain_cfg you are using
 ```
 The scripts for running the different climate projection experiments are
 CNRM-CM6-1HR historical period:
 ```
 sbatch runscript_GS1p0_CNRM_hist.slurm
+```
+CNRM-CM6-1HR for ssp3-7.0 scenario:
+```
+sbatch runscript_GS1p0_CNRM_ssp370.slurm
 ```
 
 ### Forcing data:
