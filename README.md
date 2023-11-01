@@ -12,19 +12,19 @@ Base Configuration: GO8p6 at NEMO 4.0.4
 git clone git@github.com:NOC-MSM/SE-NEMO.git
 ./MissAtl/scripts/setup/se-eORCA025_setup -w $PWD -x $PWD -s $PWD/MissAtl -m archer2 -a mpich -c gnu
 cd nemo/cfgs/se-eORCA025/
-cp -rP EXPREF EXP_CNRM
-cd EXP_CNRM
+cp -rP EXPREF EXP_GFDL
+cd EXP_GFDL
 ln -s /work/n01/shared/yuti/se-ORCA025_domain_zps/domain_cfg_zps.closea.nc domain_cfg.nc # or whatever domain_cfg you are using
 ```
 The scripts for running the different climate projection experiments are
 
-CNRM-CM6-1HR historical period:
+GFDL-ESM4 historical period:
 ```
-sbatch runscript_GS1p0_CNRM_hist.slurm
+sbatch runscript_GS1p0_GFDL_hist.slurm
 ```
-CNRM-CM6-1HR for ssp3-7.0 scenario:
+GFDL-ESM4 for ssp3-7.0 scenario:
 ```
-sbatch runscript_GS1p0_CNRM_ssp370.slurm
+sbatch runscript_GS1p0_GFDL_ssp370.slurm
 ```
 
 ### Forcing data:

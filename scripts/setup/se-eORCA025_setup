@@ -149,7 +149,7 @@ cd $CONFIG_DIR
 case "${HPC_TARG}"
   in
   archer2) ln -s /work/n01/shared/se-eORCA025 INPUTS
-           ln -s /work/n01/shared/annkat/RIVERS_CNRM/ RIVERS
+           ln -s /work/n01/shared/annkat/RIVERS_GFDL_UPD/ RIVERS
            ;;
   *)       wget http://gws-access.ceda.ac.uk/public/jmmp/se-eORCA025/inputs.tar.gz
 	   tar xvfz inputs.tar.gz
@@ -162,12 +162,12 @@ cd $CONFIG_DIR/EXPREF
 ## Add ENV into runscipts
 case "${HPC_TARG}"
   in
-  archer2) sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_GS1p0_CNRM_hist.slurm
-	   sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_GS1p0_CNRM_ssp370.slurm
+  archer2) sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_GS1p0_GFDL_hist.slurm
+	   sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript_GS1p0_GFDL_ssp370.slurm
            sed -i "s?XXX_ENV_XXX?$REPO_DIR/scripts/env/${CMP_TARG}-${MPI_TARG}?" runscript.mpirun
            ;;
-  *)       sed -i "s?XXX_ENV_XXX??" runscript_GS1p0_CNRM_hist.slurm
-	   sed -i "s?XXX_ENV_XXX??" runscript_GS1p0_CNRM_ssp370.slurm
+  *)       sed -i "s?XXX_ENV_XXX??" runscript_GS1p0_GFDL_hist.slurm
+	   sed -i "s?XXX_ENV_XXX??" runscript_GS1p0_GFDL_ssp370.slurm
            sed -i "s?XXX_ENV_XXX??" runscript.mpirun 
            ;;
 esac

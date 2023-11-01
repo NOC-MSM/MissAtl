@@ -13,13 +13,13 @@ export UCX_IB_REG_METHODS=direct
 #################### nemo runscript options ############################
 # For info on the parameters see namelist_ref                          #
 ########################################################################
-rn_rdt=600         ; ln_zps='.false.'      ; ln_tmx_itf='.false.'
+rn_rdt=1200         ; ln_zps='.true.'      ; ln_tmx_itf='.true.'
 ln_bt_auto='.true.' ; rn_bt_cmax=0.8        ; nn_baro=30
 nn_mxlice=3         ; nn_z0_ice=1           ; ln_rnf_new='.true.'
-ln_rstdate='.true.' ; ln_shlat2d='.true.'   ; nn_diaharm=1981
-rn_Cd0=2.5e-3       ; ln_loglayer='.true.'  ; ln_tide='.true.'
-ln_boost='.false.'   ; ln_gls='.true.'      ; ln_int_wave_drag='.true.'
-ln_hpg_djc='.true.' ;
+ln_rstdate='.true.' ; ln_shlat2d='.false.'   ; nn_diaharm=3333
+rn_Cd0=1.0e-3       ; ln_loglayer='.false.'  ; ln_tide='.false.'
+ln_boost='.true.'   ; ln_gls='.false.'      ; ln_int_wave_drag='.false.'
+ln_hpg_djc='.false.' ;
 ########################################################################
 
 
@@ -29,7 +29,7 @@ ln_hpg_djc='.true.' ;
 ln_spin='.true.'   # Do we require a spin up phase for the ice
 nn_spin=3          # How many years spin up
 year_st=1970       # Start year of the simulation (ramains constant)
-year_en=1975       # End year of this job submission
+year_en=2014       # End year of this job submission
 offset=0           # If rdt has changed, an offset to nn_it000 is needed
 nn_spin_cycle=1    # Change to nn_spin+1 if year is .gt. year_st
 year=$year_st      # Change if starting job part way through simulation
@@ -130,15 +130,15 @@ fi
 
 if [ "$ln_rnf_new" = ".true." ]
 then
-        sn_rnf="'CNRM_hist',24,'rorunoff',.false.,.false.,'yearly'"
-        sn_dep="'CNRM_hist',24,'rodepth',.false.,.false.,'yearly'"
+        sn_rnf="'GFDL_hist',24,'rorunoff',.false.,.false.,'yearly'"
+        sn_dep="'GFDL_hist',24,'rodepth',.false.,.false.,'yearly'"
 else
 	sn_rnf="'runoff_1m_nomask.nc',-1,'sornficb',.true.,.true.,'yearly'"
 fi
 
 echo $SLURM_NNODES
 
-. XXX_ENV_XXX
+. /work/n01/n01/annkat/MissAtl/MissAtl/scripts/env/gnu-mpich
 export LD_LIBRARY_PATH=${CRAY_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}
 export OMP_NUM_THREADS=1
 
@@ -154,7 +154,7 @@ do
    echo $year
 
    # Array pretending to be a Pythonic dictionary {EXP_NAME:NZ}
-   ARRAY=( "MA_CNRM:75"
+   ARRAY=( "GFDL_hist:75"
          )
 
    for ens in "${ARRAY[@]}"
@@ -204,11 +204,11 @@ do
       nn_itend=`./end_time_step $year $rn_rdt $year_st`; nn_itend=$(( $nn_itend + $offset ))
       if [ $nn_spin_cycle -le $nn_spin ]
       then
-         sed    "s/XXX_EXP_XXX/$nam\_S$nn_spin_cycle/g" namelist_cfg_template > namelist_cfg
+         sed    "s/XXX_EXP_XXX/$nam\_S$nn_spin_cycle/g" namelist_cfg_template_GFDL_hist > namelist_cfg
          sed -i "s/XXX_RS0_XXX/$nam\_S$(($nn_spin_cycle-1))_$rs0\_restart/g" namelist_cfg
          sed "s/XXX_RS0_XXX/$nam\_S$(($nn_spin_cycle-1))_$rs0\_restart_ice/g" namelist_ice_cfg_template > namelist_ice_cfg
       else
-         sed    "s/XXX_EXP_XXX/$nam/g" namelist_cfg_template > namelist_cfg
+         sed    "s/XXX_EXP_XXX/$nam/g" namelist_cfg_template_GFDL_hist > namelist_cfg
 	 if [ $year -eq $year_st ]
          then
             sed -i "s/XXX_RS0_XXX/$nam\_S$(($nn_spin_cycle-1))_$rs0\_restart/g" namelist_cfg
