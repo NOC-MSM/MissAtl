@@ -149,7 +149,7 @@ cd $CONFIG_DIR
 case "${HPC_TARG}"
   in
   archer2) ln -s /work/n01/shared/se-eORCA025 INPUTS
-           ln -s /work/n01/shared/annkat/RIVERS_CNRM/ RIVERS
+           ln -s /work/n01/shared/annkat/RIVERS_CNRM_UPD/ RIVERS
            ;;
   *)       wget http://gws-access.ceda.ac.uk/public/jmmp/se-eORCA025/inputs.tar.gz
 	   tar xvfz inputs.tar.gz
