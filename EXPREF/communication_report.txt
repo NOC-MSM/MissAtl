@@ -1,0 +1,53 @@
+  
+  ------------------------------------------------------------
+  Communication pattern report (second oce+sbc+top time step):
+  ------------------------------------------------------------
+  
+ Exchanged halos :  643
+ 3D Exchanged halos :  41
+ Multi arrays exchanged halos : 241
+   from which 3D :  25
+ Array max size :      81000
+  
+  lbc_lnk called
+ -    4 times by subroutine sbcblk
+ -  365 times by subroutine icedyn_rhg_evp
+ -    1 times by subroutine icedyn_rdgrft
+ -   11 times by subroutine icedyn_adv_pra
+ -    1 times by subroutine icethd
+ -    1 times by subroutine icecor
+ -    1 times by subroutine icewri
+ -    2 times by subroutine iceupdate
+ -    1 times by subroutine sbcisf
+ -    2 times by subroutine zdfphy
+ -    5 times by subroutine eosbn2
+ -    1 times by subroutine zdfmxl
+ -    2 times by subroutine zpshde
+ -    4 times by subroutine ldfslp
+ -    2 times by subroutine divhor
+ -    7 times by subroutine domvvl
+ -    2 times by subroutine sshwzv
+ -    1 times by subroutine dynkeg
+ -    1 times by subroutine dynvor
+ -    1 times by subroutine dynldf_lap_blp
+ -  201 times by subroutine dynspg_ts
+ -    2 times by subroutine diawri
+ -    1 times by subroutine traqsr
+ -    1 times by subroutine trabbc
+ -    2 times by subroutine trabbl
+ -    8 times by subroutine traadv_fct
+ -    8 times by subroutine diaar5
+ -    2 times by subroutine tranxt
+ -    3 times by subroutine dynnxt
+  
+ Global communications :   19
+ -    6 times by subroutine diaar5
+ -   12 times by subroutine diahsb
+ -    1 times by subroutine stpctl
+  
+ Delayed global communications :    2
+ -    1 times by subroutine icedyn_adv_pra
+ -    1 times by subroutine sbcfwb
+  
+  -----------------------------------------------
+  
