@@ -9,7 +9,7 @@ Base Configuration: GO8p6 at NEMO 4.0.4
 ## Quick Start for Mission Atlantic:
 
 ```
-git clone git@github.com:NOC-MSM/SE-NEMO.git
+git clone git@github.com:NOC-MSM/MissAtl
 ./MissAtl/scripts/setup/se-eORCA025_setup -w $PWD -x $PWD -s $PWD/MissAtl -m archer2 -a mpich -c gnu
 cd nemo/cfgs/se-eORCA025/
 cp -rP EXPREF EXP_CNRM
