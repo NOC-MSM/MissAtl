@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=SE_notide
-#SBATCH --time=23:50:00
+#SBATCH --time=00:50:00
 #SBATCH --account=n01-CLASS
 #SBATCH --partition=standard
 #SBATCH --qos=standard
@@ -13,13 +13,13 @@ export UCX_IB_REG_METHODS=direct
 #################### nemo runscript options ############################
 # For info on the parameters see namelist_ref                          #
 ########################################################################
-rn_rdt=1200         ; ln_zps='.true.'      ; ln_tmx_itf='.true.'
+rn_rdt=600         ; ln_zps='.false.'      ; ln_tmx_itf='.false.'
 ln_bt_auto='.true.' ; rn_bt_cmax=0.8        ; nn_baro=30
 nn_mxlice=3         ; nn_z0_ice=1           ; ln_rnf_new='.true.'
-ln_rstdate='.true.' ; ln_shlat2d='.false.'   ; nn_diaharm=3333
-rn_Cd0=1.0e-3       ; ln_loglayer='.false.'  ; ln_tide='.false.'
-ln_boost='.true.'   ; ln_gls='.false.'      ; ln_int_wave_drag='.false.'
-ln_hpg_djc='.false.' ;
+ln_rstdate='.true.' ; ln_shlat2d='.true.'   ; nn_diaharm=1981
+rn_Cd0=2.5e-3       ; ln_loglayer='.true.'  ; ln_tide='.true.'
+ln_boost='.false.'  ; ln_gls='.true.'      ; ln_int_wave_drag='.true.'
+ln_hpg_djc='.true.' ;                        ln_calc_tdiss='.true.'
 ########################################################################
 
 
@@ -29,7 +29,7 @@ ln_hpg_djc='.false.' ;
 ln_spin='.true.'   # Do we require a spin up phase for the ice
 nn_spin=3          # How many years spin up
 year_st=1970       # Start year of the simulation (ramains constant)
-year_en=2014       # End year of this job submission
+year_en=1970       # End year of this job submission
 offset=0           # If rdt has changed, an offset to nn_it000 is needed
 nn_spin_cycle=1    # Change to nn_spin+1 if year is .gt. year_st
 year=$year_st      # Change if starting job part way through simulation
