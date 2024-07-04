@@ -50,7 +50,7 @@
 %ARFLAGS             -r
 %MK                  gmake
 %USER_INC            %XIOS_INC %NCDF_INC
-%USER_LIB            %XIOS_LIB %NCDF_LIB -L/opt/cray/pe/libsci/21.08.1.2/GNU/9.1/x86_64/lib -lsci_gnu_82
+%USER_LIB            %XIOS_LIB %NCDF_LIB -L/opt/cray/pe/libsci/22.12.1.1/GNU/9.1/x86_64/lib -lsci_gnu_82
 
 %CC                  cc -Wl,"--allow-multiple-definition"
 %CFLAGS              -O0 -fcommon -Wl,"--allow-multiple-definition"
